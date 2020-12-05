@@ -1,0 +1,1 @@
+Component Class is for sharing objects between applications.

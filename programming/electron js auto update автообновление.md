@@ -1,0 +1,1 @@
+https://www.electron.build/auto-update#differences-between-electron-updater-and-built-in-autoupdater

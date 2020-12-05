@@ -1,27 +1,26 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <svg id='d3-container' width='1024' height='768'/>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+<script>
+import { onMounted } from 'vue';
+import { initD3 } from './components/initD3';
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld,
+export default {
+  setup() {
+    onMounted(() => {
+      initD3('#d3-container');
+    });
+
+    return {
+
+    };
   },
-});
+};
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style>
+.node {}
+
+.link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
 </style>

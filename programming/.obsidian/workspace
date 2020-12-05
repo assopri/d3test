@@ -1,0 +1,101 @@
+{
+  "main": {
+    "id": "8024f029274a7771",
+    "type": "split",
+    "children": [
+      {
+        "id": "71b35c3700a441cd",
+        "type": "leaf",
+        "active": true,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "snoopy снупи консультация Олег.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c0fbdf3da9e3af68",
+    "type": "split",
+    "children": [
+      {
+        "id": "0b76ed3c5e8b9999",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7f641f69aad27d96",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "7cca783a1b511497",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "fetch",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 322.0007801055908
+  },
+  "right": {
+    "id": "67e77ec4e783c155",
+    "type": "split",
+    "children": [
+      {
+        "id": "e640ee49cf69b708",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ed3504f6229cad75",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "snoopy снупи консультация Олег.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "lastOpenFiles": [
+    "snoopy снупи консультация Олег.md",
+    "fetch - to find out if smth new in repositaries.md",
+    "шаблон с serve electron-webpack-quick-start.md",
+    "regex match all with group 1 in javascript.md",
+    "Untitled 2.md",
+    "electron build exe.md",
+    "Untitled 3.md",
+    "prosemirror.md",
+    "#5 консультация Олег.md",
+    "#2 snoopy снупи консультация Олег.md"
+  ]
+}
