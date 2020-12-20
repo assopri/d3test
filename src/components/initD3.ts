@@ -264,7 +264,8 @@ export const initD3 = async (container: string) => {
   }).on('end', (e) => {
     dragLine
       .classed('hidden', true)
-      .style('marker-end', '');
+      .style('marker-end', '')
+      .attr('d', 'M 0 0 L 0 0');
 
       svg?.classed('active', false);
 
