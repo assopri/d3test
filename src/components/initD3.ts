@@ -57,7 +57,6 @@ const links: LinkData[] = [];
 const nodes: NodeData[] = [];
 
 function zoomed(d: any) {
-  console.log(d);
   const scale = d.transform.k;
   const newViewBox = [
     -d.transform.x / scale,
@@ -246,7 +245,9 @@ export const initD3 = async (container: string) => {
     const outcomingLinks = getInternalLinks(fileDictionary[key].content);
 
     outcomingLinks.forEach((el) => {
-      if (!fileDictionary[el]) { console.log('NO: ', el); } else {
+      if (!fileDictionary[el]) {
+        // console.log('NO: ', el);
+      } else {
         links.push(
           {
             source: fileDictionary[key],
