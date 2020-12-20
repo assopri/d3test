@@ -46,7 +46,9 @@ type Link = d3.Selection<SVGPathElement, LinkData, d3.BaseType, unknown>
 
 let node: Node | null | undefined = null;
 let link: Link | null | undefined = null;
-let edgepaths: any | null = null;
+let mousedownNode: any | null = null;
+let mouseupNode: any | null = null;
+let dragLine: any | null = null;
 let edgelabels: any | null = null;
 let svg: d3.Selection<HTMLElement, any, d3.BaseType, unknown> | null | undefined = null;
 let width = 0;
@@ -72,23 +74,22 @@ function ticked() {
   node
     .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
 
-  link
+  link.attr('d', (d: any) => {
     // @ts-ignore
     // eslint-disable-next-line no-underscore-dangle
-    .attr('x1', (d) => node._groups[0][d.source.id - 1].__data__.x)
+    const sourceX = node._groups[0][d.source.id - 1].__data__.x;
     // @ts-ignore
     // eslint-disable-next-line no-underscore-dangle
-    .attr('y1', (d) => node._groups[0][d.source.id - 1].__data__.y)
+    const sourceY = node._groups[0][d.source.id - 1].__data__.y;
     // @ts-ignore
     // eslint-disable-next-line no-underscore-dangle
-    .attr('x2', (d) => node._groups[0][d.target.id - 1].__data__.x)
+    const targetX = node._groups[0][d.target.id - 1].__data__.x;
     // @ts-ignore
     // eslint-disable-next-line no-underscore-dangle
-    .attr('y2', (d) => node._groups[0][d.target.id - 1].__data__.y);
+    const targetY = node._groups[0][d.target.id - 1].__data__.y;
 
-  // @ts-ignore
-  // eslint-disable-next-line no-underscore-dangle
-  edgepaths.attr('d', (d: any) => `M ${node._groups[0][d.source.id].__data__.x} ${node._groups[0][d.source.id].__data__.y} L ${node._groups[0][d.target.id].__data__.x} ${node._groups[0][d.target.id].__data__.y}`);
+    return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+  });
 
   edgelabels.attr('transform', function (d: any) {
     if (d.target.x < d.source.x) {
@@ -114,17 +115,10 @@ function update() {
     .append('path')
     .attr('class', 'link')
     .attr('marker-end', 'url(#arrowhead)');
+
   if (!link) return;
   link.append('title')
     .text((d) => d.type);
-
-  edgepaths = svg?.selectAll('.edgepath')
-    .data(links)
-    .enter()
-    .append('path')
-    .attr('class', 'edgepath')
-    .attr('id', (_: unknown, i: number) => `edgepath${i}`)
-    .style('pointer-events', 'none');
 
   edgelabels = svg?.selectAll('.edgelabel')
     .data(links)
@@ -150,11 +144,15 @@ function update() {
     .attr('class', 'node');
 
   if (!node) return;
+
   node.append('circle')
     .attr('r', (data) => links.filter((link) => link.target.id === data.id).length * 3 + 5)
     .style('fill', (_, i) => colors(i.toString()))
-    .on('click', (e) => {
-      console.log(e);
+    .on('mouseover', (e: any) => {
+      d3.select(e.target).attr('transform', 'scale(2)');
+    })
+    .on('mouseout', (e: any) => {
+      d3.select(e.target).attr('transform', 'scale(1)');
     });
 
   node.append('title')
@@ -194,6 +192,8 @@ export const initD3 = async (container: string) => {
 
   colors = d3.scaleOrdinal(d3.schemeCategory10);
 
+  const pt = d3.select('svg');
+
   svg.append('defs').append('marker')
     .attr('id', 'arrowhead')
     .attr('viewBox', '-0 -5 10 10')
@@ -208,29 +208,101 @@ export const initD3 = async (container: string) => {
     .attr('fill', '#999')
     .style('stroke', 'none');
 
+  // drag starting arrow
+  svg.append('defs').append('marker')
+    .attr('id', 'drag-arrow')
+    .attr('viewBox', '-0 -5 10 10')
+    .attr('refX', 8)
+    .attr('refY', 0)
+    .attr('orient', 'auto')
+    .attr('markerWidth', 13)
+    .attr('markerHeight', 13)
+    .attr('xoverflow', 'visible')
+    .append('svg:path')
+    .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+    .attr('fill', '#999')
+    .style('stroke', 'none');
+
+  // @ts-ignore
+  svg.call(d3.drag().on('start', (e) => {
+    svg?.classed('active', true);
+
+    const datas = d3.select(e.sourceEvent.target).data()[0];
+
+    mousedownNode = datas;
+
+    if (mousedownNode !== undefined) {
+      dragLine
+        .style('marker-end', 'url(#drag-arrow)')
+        .classed('hidden', false)
+        .attr('d', `M${mousedownNode.x},${mousedownNode.y}L${mousedownNode.x},${mousedownNode.y}`);
+
+      update();
+    } else {
+      const pointer = d3.pointer(e);
+
+      nodes.push({
+        x: pointer[0],
+        y: pointer[1],
+        name: 'created by click',
+        label: 'labe',
+        id: nodes.length + 1,
+      });
+
+      update();
+    }
+  }).on('drag', (e) => {
+    if (!mousedownNode) return;
+
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const zoom = pt?._groups[0][0].__zoom;
+
+    if (!zoom) return;
+
+    dragLine.attr('d', `M${mousedownNode.x},${mousedownNode.y}L${(e.x - zoom.x) / zoom.k},${(e.y - zoom.y) / zoom.k}`);
+  }).on('end', (e) => {
+    dragLine
+      .classed('hidden', true)
+      .style('marker-end', '');
+
+      svg?.classed('active', false);
+
+      const dataa = d3.select(e.sourceEvent.target).data()[0];
+
+      mouseupNode = dataa;
+
+      if (!mouseupNode || !mousedownNode) return;
+
+      if (mousedownNode.id === mouseupNode.id) return;
+
+      const source = mousedownNode;
+      const target = mouseupNode;
+
+      links.push({
+        source, target, type: '',
+      });
+
+      update();
+  }));
+
   // @ts-ignore
   d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed)(svg);
 
-  svg.on('click', (e) => {
-    const pointer = d3.pointer(e);
-    nodes.push({
-      x: pointer[0],
-      y: pointer[1],
-      name: 'created by click',
-      label: 'labe',
-      id: nodes.length,
-    });
-    update();
-  });
+  // drag line
+  dragLine = svg.append('svg:path')
+    .attr('class', 'link dragline hidden')
+    .attr('d', 'M 0 0 L 0 0');
 
   simulation = d3.forceSimulation<NodeData, LinkData>()
-    .force('link', d3.forceLink<NodeData, LinkData>().id((d) => d.id.toString()).distance(150))
+    .force('link', d3.forceLink<NodeData, LinkData>().id((d) => d.id.toString()).distance(550))
     .force('charge', d3.forceManyBody().strength(-150))
     .force('x', d3.forceX(width / 2))
     .force('y', d3.forceY(height / 2));
 
   nodes.length = 0;
   links.length = 0;
+
   const fileDictionary = await ipcRenderer.invoke('parse-vault-files');
 
   // let index = 0;
