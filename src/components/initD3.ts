@@ -42,7 +42,7 @@ interface LinkData {
 }
 
 type Node = d3.Selection<any, NodeData, d3.BaseType, unknown>
-type Link = d3.Selection<SVGLineElement, LinkData, d3.BaseType, unknown>
+type Link = d3.Selection<SVGPathElement, LinkData, d3.BaseType, unknown>
 
 let node: Node | null | undefined = null;
 let link: Link | null | undefined = null;
@@ -111,7 +111,7 @@ function update() {
   link = svg?.selectAll('.link')
     .data(links)
     .enter()
-    .append('line')
+    .append('path')
     .attr('class', 'link')
     .attr('marker-end', 'url(#arrowhead)');
   if (!link) return;
