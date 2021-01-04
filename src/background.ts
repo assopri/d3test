@@ -103,6 +103,7 @@ ipcMain.handle('parse-vault-files', async () => {
       id: number;
     };
   } = {};
+  // console.log(files)
   for (let index = 0; index < files.length; index += 1) {
     const fileName = path.basename(files[index], path.extname(files[index]));
     fileDictionary[fileName] = {

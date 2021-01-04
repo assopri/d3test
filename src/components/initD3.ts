@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 
 interface NodeData {
   name: string;
+  filePath: string;
   label: string;
   id: number;
   index?: number;
@@ -241,13 +242,13 @@ export const initD3 = async (container: string) => {
     } else {
       const pointer = d3.pointer(e);
 
-      nodes.push({
-        x: pointer[0],
-        y: pointer[1],
-        name: 'created by click',
-        label: 'labe',
-        id: nodes.length + 1,
-      });
+      // nodes.push({
+      //   x: pointer[0],
+      //   y: pointer[1],
+      //   name: 'created by click',
+      //   label: 'labe',
+      //   id: nodes.length + 1,
+      // });
 
       update();
     }
@@ -280,6 +281,9 @@ export const initD3 = async (container: string) => {
       const source = mousedownNode;
       const target = mouseupNode;
 
+      console.log(source)
+      console.log(target)
+
       links.push({
         source, target, type: '',
       });
@@ -296,7 +300,7 @@ export const initD3 = async (container: string) => {
     .attr('d', 'M 0 0 L 0 0');
 
   simulation = d3.forceSimulation<NodeData, LinkData>()
-    .force('link', d3.forceLink<NodeData, LinkData>().id((d) => d.id.toString()).distance(550))
+    .force('link', d3.forceLink<NodeData, LinkData>().id((d) => d.id.toString()).distance(150))
     .force('charge', d3.forceManyBody().strength(-150))
     .force('x', d3.forceX(width / 2))
     .force('y', d3.forceY(height / 2));
@@ -306,10 +310,13 @@ export const initD3 = async (container: string) => {
 
   const fileDictionary = await ipcRenderer.invoke('parse-vault-files');
 
+  // console.log(fileDictionary);
+
   // let index = 0;
   Object.entries(fileDictionary).forEach(([key]) => {
     nodes.push({
       name: key,
+      filePath: fileDictionary[key].path,
       label: 'labe',
       id: fileDictionary[key].id,
     });
