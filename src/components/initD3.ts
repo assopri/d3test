@@ -50,6 +50,7 @@ let link: Link | null | undefined = null;
 let mousedownNode: any | null = null;
 let mouseupNode: any | null = null;
 let dragLine: any | null = null;
+let dragCanvas = false;
 let edgelabels: any | null = null;
 let svg: d3.Selection<HTMLElement, any, d3.BaseType, unknown> | null | undefined = null;
 let width = 0;
@@ -242,17 +243,16 @@ export const initD3 = async (container: string) => {
     } else {
       const pointer = d3.pointer(e);
 
-      // nodes.push({
-      //   x: pointer[0],
-      //   y: pointer[1],
-      //   name: 'created by click',
-      //   label: 'labe',
-      //   id: nodes.length + 1,
-      // });
+      dragCanvas = true
 
       update();
     }
   }).on('drag', (e) => {
+    if (dragCanvas) {
+      // @ts-ignore
+      zoomBehavior.translateBy(svg, e.dx, e.dy)
+      return;
+    }
     if (!mousedownNode) return;
 
     // @ts-ignore
@@ -263,6 +263,11 @@ export const initD3 = async (container: string) => {
 
     dragLine.attr('d', `M${mousedownNode.x},${mousedownNode.y}L${(e.x - zoom.x) / zoom.k},${(e.y - zoom.y) / zoom.k}`);
   }).on('end', (e) => {
+    if(dragCanvas) {
+      dragCanvas = false
+      return
+    }
+
     dragLine
       .classed('hidden', true)
       .style('marker-end', '')
@@ -292,7 +297,10 @@ export const initD3 = async (container: string) => {
   }));
 
   // @ts-ignore
-  d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed)(svg);
+  const zoomBehavior = d3.zoom().scaleExtent([1, 5]).on('zoom', zoomed);
+
+  // @ts-ignore
+  svg.call(zoomBehavior)
 
   // drag line
   dragLine = svg.append('svg:path')
